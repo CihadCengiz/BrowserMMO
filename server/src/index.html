@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browser MMO</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <canvas
+    id="ctx"
+    width="500"
+    height="500"
+    style="border: 1px solid #000000"
+    ></canvas>
+    <script>
+      var ctx = document.getElementById("ctx").getContext("2d");
+      ctx.font = "30px Arial";
+
+      const socket = io();
+
+      socket.on("newPositions", (data) => {
+        ctx.clearRect(0, 0, 500, 500);
+        for(let i=0; i < data.player.length; i++) {
+            ctx.fillText(data.player[i].name, data.player[i].x, data.player[i].y);
+        }
+
+        for(let i=0; i < data.bullet.length; i++) {
+            ctx.fillRect(data.bullet[i].x-5, data.bullet[i].y-5, 10, 10);
+        }
+      });
+
+      document.onkeydown = (e) => {
+        if(e.keyCode === 68)
+            socket.emit("keyPress", {inputId: "right", state:true});
+        if(e.keyCode === 65)
+            socket.emit("keyPress", {inputId: "left", state:true});
+        if(e.keyCode === 83)
+            socket.emit("keyPress", {inputId: "up", state:true});
+        if(e.keyCode === 87)
+            socket.emit("keyPress", {inputId: "down", state:true});
+      }
+
+      document.onkeyup = (e) => {
+        if(e.keyCode === 68)
+            socket.emit("keyPress", {inputId: "right", state:false});
+        if(e.keyCode === 65)
+            socket.emit("keyPress", {inputId: "left", state:false});
+        if(e.keyCode === 83)
+            socket.emit("keyPress", {inputId: "up", state:false});
+        if(e.keyCode === 87)
+            socket.emit("keyPress", {inputId: "down", state:false});
+      }
+    </script>
+  </body>
+</html>
